@@ -21,7 +21,7 @@ from flask import (
 )
 
 from bmc_converter import GcodeOptions, open_bmc
-from bmc_converter.bmc_reader import estimate_point_count
+from bmc_converter.bmc_reader import estimate_point_count, validate_bmc_file
 from bmc_converter.gcode_writer import write_gcode
 
 app = Flask(__name__)
@@ -204,10 +204,16 @@ def convert():
     bmc_path = job_folder / Path(filename).name
     upload.save(bmc_path)
 
+    ok, msg = validate_bmc_file(bmc_path)
+    if not ok:
+        shutil.rmtree(job_folder, ignore_errors=True)
+        flash(msg, "error")
+        return redirect(url_for("index"))
+
     with JOBS_LOCK:
         JOBS[job_id] = {
             "status": "queued",
-            "message": "Upload received…",
+            "message": msg,
             "created": time.time(),
             "folder": str(job_folder),
             "nc_path": None,
