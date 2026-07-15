@@ -29,9 +29,33 @@ app.secret_key = os.environ.get("SECRET_KEY") or secrets.token_hex(16)
 app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024 * 1024  # 2 GB
 
 BASE_DIR = Path(__file__).resolve().parent
-# On Render persistent disk, set WORK_DIR=/var/data/web_work
-WORK_DIR = Path(os.environ.get("WORK_DIR", str(BASE_DIR / "web_work")))
-WORK_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _resolve_work_dir() -> Path:
+    """Prefer WORK_DIR env (Render disk). Fall back if mount is missing."""
+    candidates = []
+    env_dir = os.environ.get("WORK_DIR", "").strip()
+    if env_dir:
+        candidates.append(Path(env_dir))
+    candidates.append(Path("/tmp/bmc_web_work"))
+    candidates.append(BASE_DIR / "web_work")
+
+    for path in candidates:
+        try:
+            path.mkdir(parents=True, exist_ok=True)
+            probe = path / ".write_test"
+            probe.write_text("ok", encoding="utf-8")
+            probe.unlink(missing_ok=True)
+            return path
+        except OSError:
+            continue
+    # Last resort: /tmp always exists on Render
+    fallback = Path("/tmp/bmc_web_work")
+    fallback.mkdir(parents=True, exist_ok=True)
+    return fallback
+
+
+WORK_DIR = _resolve_work_dir()
 
 # job_id -> {status, message, nc_path, created, ...}
 JOBS: dict[str, dict] = {}
