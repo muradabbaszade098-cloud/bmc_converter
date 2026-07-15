@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BMC → G-code Converter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}" />
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <p class="brand">BMC Converter</p>
+      <h1>Upload .BMC, download G-code</h1>
+      <p class="lede">
+        Convert AGAT / CNConv diamond-impact files to Mach3, GRBL, or LinuxCNC G-code.
+      </p>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="flash flash-{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form class="panel" action="{{ url_for('convert') }}" method="post" enctype="multipart/form-data">
+      <label class="file-field">
+        <span class="label">BMC file</span>
+        <input type="file" name="bmc_file" accept=".bmc,.BMC" required />
+      </label>
+
+      <fieldset class="modes">
+        <legend>Conversion mode</legend>
+        <label class="radio">
+          <input type="radio" name="mode" value="preview" checked />
+          <span>
+            <strong>Preview</strong>
+            <small>Full image, every 80th strike — best for simulators (~minutes on large files)</small>
+          </span>
+        </label>
+        <label class="radio">
+          <input type="radio" name="mode" value="sample" />
+          <span>
+            <strong>Sample</strong>
+            <small>First 5,000 strikes — fast test download</small>
+          </span>
+        </label>
+        <label class="radio">
+          <input type="radio" name="mode" value="full" />
+          <span>
+            <strong>Full quality</strong>
+            <small>Every strike — can create multi‑GB files and take a long time</small>
+          </span>
+        </label>
+      </fieldset>
+
+      <div class="grid">
+        <label>
+          <span class="label">Width (mm)</span>
+          <input type="number" name="width_mm" value="100" min="1" step="0.1" required />
+        </label>
+        <label>
+          <span class="label">Height (mm, optional)</span>
+          <input type="number" name="height_mm" min="1" step="0.1" placeholder="auto" />
+        </label>
+        <label>
+          <span class="label">Controller</span>
+          <select name="controller">
+            <option value="generic">Generic</option>
+            <option value="mach3">Mach3</option>
+            <option value="grbl">GRBL</option>
+            <option value="linuxcnc">LinuxCNC</option>
+          </select>
+        </label>
+        <label>
+          <span class="label">Impact mode</span>
+          <select name="impact">
+            <option value="hammer" selected>Hammer axis tap 0.3 mm (NEMA)</option>
+            <option value="dwell">Dwell (G4) — simulator placeholder</option>
+            <option value="m7_m9">M7/M9 mist relay</option>
+            <option value="m8_m9">M8/M9 flood relay</option>
+            <option value="m3_m5">M3/M5 spindle pulse</option>
+          </select>
+        </label>
+        <label>
+          <span class="label">Hammer axis letter</span>
+          <select name="impact_axis">
+            <option value="A" selected>A (recommended)</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="U">U</option>
+            <option value="V">V</option>
+            <option value="W">W</option>
+          </select>
+        </label>
+        <label>
+          <span class="label">Dwell (seconds, non-hammer modes)</span>
+          <input type="number" name="dwell" value="0.01" min="0" step="0.001" />
+        </label>
+        <label>
+          <span class="label">Hammer tap position (mm)</span>
+          <input type="number" name="z_impact" value="-0.3" step="0.01" />
+        </label>
+        <label>
+          <span class="label">Hammer retract (mm)</span>
+          <input type="number" name="z_safe" value="0" step="0.01" />
+        </label>
+        <label>
+          <span class="label">Min intensity (1–100)</span>
+          <input type="number" name="min_intensity" value="1" min="1" max="100" />
+        </label>
+      </div>
+
+      <details class="advanced">
+        <summary>Advanced overrides</summary>
+        <div class="grid">
+          <label>
+            <span class="label">Stride (full mode)</span>
+            <input type="number" name="stride" value="1" min="1" />
+          </label>
+          <label>
+            <span class="label">Max strikes (optional)</span>
+            <input type="number" name="max_strikes" min="1" placeholder="no limit" />
+          </label>
+        </div>
+      </details>
+
+      <button type="submit" class="cta">Convert to G-code</button>
+    </form>
+
+    <footer class="foot">
+      <p>Local tool — files stay on this computer. Temporary jobs are cleaned up after about one hour.</p>
+    </footer>
+  </div>
+</body>
+</html>

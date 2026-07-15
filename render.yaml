@@ -1,0 +1,19 @@
+# Exported from Render Blueprint (optional — you can also configure in dashboard)
+services:
+  - type: web
+    name: bmc-converter
+    runtime: python
+    plan: starter   # free is too limited for large BMC files; use starter or higher
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -b 0.0.0.0:$PORT -w 1 --threads 4 --timeout 3600 webapp:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: HOST
+        value: 0.0.0.0
+    disk:
+      name: bmc-work
+      mountPath: /var/data
+      sizeGB: 10

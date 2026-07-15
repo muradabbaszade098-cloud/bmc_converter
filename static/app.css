@@ -1,0 +1,211 @@
+:root {
+  --bg0: #e8e2d6;
+  --bg1: #f4efe6;
+  --ink: #1c1914;
+  --muted: #5c564c;
+  --line: #c9c0b0;
+  --accent: #0f5c4c;
+  --accent-ink: #f4efe6;
+  --danger: #8b2e2e;
+  --warn-bg: #f3e6c8;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "DM Sans", system-ui, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse 80% 50% at 10% -10%, #d9e8e2 0%, transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 0%, #e6dcc8 0%, transparent 50%),
+    linear-gradient(180deg, var(--bg1), var(--bg0));
+}
+
+.page {
+  width: min(720px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2.5rem 0 3rem;
+}
+
+.page.narrow { width: min(520px, calc(100% - 2rem)); }
+
+.brand {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 0.75rem;
+  font-weight: 500;
+}
+
+h1 {
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  line-height: 1.15;
+  margin: 0 0 0.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.lede {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+  max-width: 36ch;
+}
+
+.hero { margin-bottom: 1.75rem; }
+
+.panel {
+  background: rgba(255, 252, 246, 0.88);
+  border: 1px solid var(--line);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.file-field input[type="file"] {
+  display: block;
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.85rem;
+  border: 1px dashed var(--line);
+  background: #fff;
+  font-family: inherit;
+}
+
+.label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.modes {
+  border: 1px solid var(--line);
+  padding: 0.85rem 1rem 1rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.modes legend {
+  padding: 0 0.35rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.radio {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.radio strong { display: block; font-weight: 600; }
+.radio small { display: block; color: var(--muted); font-size: 0.85rem; margin-top: 0.15rem; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+}
+
+@media (max-width: 560px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+input[type="number"],
+select {
+  width: 100%;
+  padding: 0.65rem 0.7rem;
+  border: 1px solid var(--line);
+  background: #fff;
+  font: inherit;
+  color: var(--ink);
+}
+
+.advanced {
+  border-top: 1px solid var(--line);
+  padding-top: 0.75rem;
+}
+
+.advanced summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.cta {
+  appearance: none;
+  border: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  font-weight: 600;
+  padding: 0.95rem 1.2rem;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+}
+
+.cta:hover { filter: brightness(1.08); }
+
+.cta.download { display: inline-block; }
+
+.foot {
+  margin-top: 1.5rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.flashes { list-style: none; padding: 0; margin: 0 0 1rem; }
+.flash {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--line);
+  background: var(--warn-bg);
+  margin-bottom: 0.5rem;
+}
+.flash-error { border-color: #d4a0a0; background: #f8e8e8; color: var(--danger); }
+
+.status-panel { align-items: flex-start; }
+.status-pill {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--line);
+  padding: 0.3rem 0.55rem;
+  margin: 0;
+}
+
+.status-msg {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--muted);
+}
+
+.spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--line);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.back {
+  color: var(--accent);
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
+}
+
+[hidden] { display: none !important; }

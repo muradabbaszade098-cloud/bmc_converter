@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+web_work/
+*.nc
+!samples/*.nc
+2 copy.bmc
+full.nc
+.env
+.DS_Store

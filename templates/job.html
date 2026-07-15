@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Conversion status — BMC Converter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}" />
+</head>
+<body>
+  <div class="page narrow">
+    <header class="hero">
+      <p class="brand">BMC Converter</p>
+      <h1>Conversion status</h1>
+    </header>
+
+    <div class="panel status-panel" data-job-id="{{ job_id }}" data-status="{{ job.status }}">
+      <p class="status-pill" id="status-pill">{{ job.status }}</p>
+      <p class="status-msg" id="status-msg">{{ job.message }}</p>
+
+      <div class="spinner" id="spinner" {% if job.status in ['done', 'error'] %}hidden{% endif %}></div>
+
+      <a class="cta download" id="download-btn"
+         href="{{ url_for('download', job_id=job_id) }}"
+         {% if job.status != 'done' %}hidden{% endif %}>
+        Download G-code (.nc)
+      </a>
+
+      {% if job.status == 'error' %}
+        <p class="flash flash-error">{{ job.message }}</p>
+      {% endif %}
+
+      <a class="back" href="{{ url_for('index') }}">Convert another file</a>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const panel = document.querySelector(".status-panel");
+      if (!panel) return;
+      const jobId = panel.dataset.jobId;
+      let status = panel.dataset.status;
+      if (status === "done" || status === "error") return;
+
+      const pill = document.getElementById("status-pill");
+      const msg = document.getElementById("status-msg");
+      const spinner = document.getElementById("spinner");
+      const btn = document.getElementById("download-btn");
+
+      async function poll() {
+        try {
+          const res = await fetch("/job/" + jobId + "/json");
+          const data = await res.json();
+          status = data.status;
+          pill.textContent = data.status;
+          msg.textContent = data.message || "";
+          if (data.status === "done") {
+            spinner.hidden = true;
+            btn.hidden = false;
+            if (data.download_url) btn.href = data.download_url;
+            return;
+          }
+          if (data.status === "error") {
+            spinner.hidden = true;
+            return;
+          }
+        } catch (e) {
+          msg.textContent = "Waiting for server…";
+        }
+        setTimeout(poll, 1500);
+      }
+      setTimeout(poll, 1000);
+    })();
+  </script>
+</body>
+</html>
